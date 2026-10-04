@@ -52,6 +52,36 @@ app.get("/api/v1/messages/:id", (req, res) => {
     });
 });
 
+app.post("/api/v1/messages", (req, res) => {
+    const user = req.body.user;
+    const message = req.body.message;
+
+    if (!user || !message) {
+        return res.status(400).send({
+            status: "fail",
+            data: {
+                message: "User and message are required"
+            }
+        });
+    }
+
+    const newMessage = {
+        user: user,
+        message: message
+    };
+
+    messages.push(newMessage);
+
+    const result = {
+        status: "success",
+        data: {
+            message: newMessage
+        }
+    };
+
+    res.status(200).send(result);
+});
+
 // app.listen altijd onderaan
 app.listen(port, () => {
     console.log(`Server running on port ${port}`);
