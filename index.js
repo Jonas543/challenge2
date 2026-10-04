@@ -116,6 +116,28 @@ app.put("/api/v1/messages/:id", (req, res) => {
     });
 });
 
+app.delete("/api/v1/messages/:id", (req, res) => {
+    const id = req.params.id;
+
+    if (!messages[id]) {
+        return res.status(404).send({
+            status: "error",
+            message: "Message not found"
+        });
+    }
+
+    const deletedMessage = messages[id];
+
+    messages.splice(id, 1);
+
+    res.status(200).send({
+        status: "success",
+        data: {
+            message: deletedMessage
+        }
+    });
+});
+
 // app.listen altijd onderaan
 app.listen(port, () => {
     console.log(`Server running on port ${port}`);
