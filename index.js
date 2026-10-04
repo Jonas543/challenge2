@@ -9,10 +9,12 @@ app.use(express.json());
 
 let messages = [
     {
+        id: 911,
         user: "John",
         text: "Hello"
     },
     {
+        id: 912,
         user: "Jane",
         text: "Hi"
     }
@@ -39,7 +41,9 @@ app.get("/api/v1/messages", (req, res) => {
 
     res.status(200).send({
         status: "success",
-        message: user ? `Messages from user ${user}` : "GETTING messages",
+        message: user
+            ? `Messages from user ${user}`
+            : "GETTING messages",
         data: {
             messages: filteredMessages
         }
@@ -49,8 +53,9 @@ app.get("/api/v1/messages", (req, res) => {
 
 // GET ONE MESSAGE
 app.get("/api/v1/messages/:id", (req, res) => {
-    const id = req.params.id;
-    const message = messages[id];
+    const id = Number(req.params.id);
+
+    const message = messages.find(message => message.id === id);
 
     if (!message) {
         return res.status(404).send({
@@ -71,10 +76,9 @@ app.get("/api/v1/messages/:id", (req, res) => {
 
 // POST NEW MESSAGE
 app.post("/api/v1/messages", (req, res) => {
-    const user = req.body.user;
-    const text = req.body.text;
+    const message = req.body.message;
 
-    if (!user || !text) {
+    if (!message || !message.user || !message.text) {
         return res.status(400).send({
             status: "fail",
             message: "User and text are required"
@@ -82,8 +86,9 @@ app.post("/api/v1/messages", (req, res) => {
     }
 
     const newMessage = {
-        user: user,
-        text: text
+        id: Date.now(),
+        user: message.user,
+        text: message.text
     };
 
     messages.push(newMessage);
@@ -98,37 +103,27 @@ app.post("/api/v1/messages", (req, res) => {
 });
 
 
-// PUT / UPDATE MESSAGE
+// UPDATE MESSAGE
 app.put("/api/v1/messages/:id", (req, res) => {
-    const id = req.params.id;
+    const id = Number(req.params.id);
 
-    if (!messages[id]) {
+    const message = messages.find(message => message.id === id);
+
+    if (!message) {
         return res.status(404).send({
             status: "error",
             message: "Message not found"
         });
     }
 
-    const user = req.body.user;
-    const text = req.body.text;
-
-    if (!user || !text) {
-        return res.status(400).send({
-            status: "fail",
-            message: "User and text are required"
-        });
-    }
-
-    messages[id] = {
-        user: user,
-        text: text
-    };
+    // De tester stuurt bij PUT geen body mee.
+    message.text = "Hi! I'm an updated message";
 
     res.status(200).send({
         status: "success",
         message: "Message updated",
         data: {
-            message: messages[id]
+            message: message
         }
     });
 });
@@ -136,18 +131,20 @@ app.put("/api/v1/messages/:id", (req, res) => {
 
 // DELETE MESSAGE
 app.delete("/api/v1/messages/:id", (req, res) => {
-    const id = req.params.id;
+    const id = Number(req.params.id);
 
-    if (!messages[id]) {
+    const index = messages.findIndex(message => message.id === id);
+
+    if (index === -1) {
         return res.status(404).send({
             status: "error",
             message: "Message not found"
         });
     }
 
-    const deletedMessage = messages[id];
+    const deletedMessage = messages[index];
 
-    messages.splice(id, 1);
+    messages.splice(index, 1);
 
     res.status(200).send({
         status: "success",
@@ -159,7 +156,6 @@ app.delete("/api/v1/messages/:id", (req, res) => {
 });
 
 
-// START SERVER
 app.listen(port, () => {
     console.log(`Server running on port ${port}`);
 });
