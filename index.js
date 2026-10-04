@@ -23,10 +23,18 @@ app.get("/", (req, res) => {
 
 // NIEUWE GET ROUTE HIER
 app.get("/api/v1/messages", (req, res) => {
+    const user = req.query.user;
+
+    let filteredMessages = messages;
+
+    if (user) {
+        filteredMessages = messages.filter(message => message.user === user);
+    }
+
     const result = {
         status: "success",
         data: {
-            messages: messages
+            messages: filteredMessages
         }
     };
 
