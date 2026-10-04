@@ -10,39 +10,44 @@ app.use(express.json());
 let messages = [
     {
         user: "John",
-        message: "Hello"
+        text: "Hello"
     },
     {
         user: "Jane",
-        message: "Hi"
+        text: "Hi"
     }
 ];
 
-// Bestaande route
+
+// HOME
 app.get("/", (req, res) => {
     res.send("Hello World!");
 });
 
-// NIEUWE GET ROUTE HIER
+
+// GET ALL MESSAGES + FILTER BY USER
 app.get("/api/v1/messages", (req, res) => {
     const user = req.query.user;
 
     let filteredMessages = messages;
 
     if (user) {
-        filteredMessages = messages.filter(message => message.user === user);
+        filteredMessages = messages.filter(
+            message => message.user.toLowerCase() === user.toLowerCase()
+        );
     }
 
-    const result = {
+    res.status(200).send({
         status: "success",
+        message: user ? `Messages from user ${user}` : "GETTING messages",
         data: {
             messages: filteredMessages
         }
-    };
-
-    res.status(200).send(result);
+    });
 });
 
+
+// GET ONE MESSAGE
 app.get("/api/v1/messages/:id", (req, res) => {
     const id = req.params.id;
     const message = messages[id];
@@ -56,46 +61,46 @@ app.get("/api/v1/messages/:id", (req, res) => {
 
     res.status(200).send({
         status: "success",
+        message: `GETTING message ${id}`,
         data: {
             message: message
         }
     });
 });
 
+
+// POST NEW MESSAGE
 app.post("/api/v1/messages", (req, res) => {
     const user = req.body.user;
-    const message = req.body.message;
+    const text = req.body.text;
 
-    if (!user || !message) {
+    if (!user || !text) {
         return res.status(400).send({
             status: "fail",
-            data: {
-                message: "User and message are required"
-            }
+            message: "User and text are required"
         });
     }
 
     const newMessage = {
         user: user,
-        message: message
+        text: text
     };
 
     messages.push(newMessage);
 
-    const result = {
+    res.status(200).send({
         status: "success",
+        message: "Message saved",
         data: {
             message: newMessage
         }
-    };
-
-    res.status(200).send(result);
+    });
 });
 
+
+// PUT / UPDATE MESSAGE
 app.put("/api/v1/messages/:id", (req, res) => {
     const id = req.params.id;
-    const user = req.body.user;
-    const message = req.body.message;
 
     if (!messages[id]) {
         return res.status(404).send({
@@ -104,28 +109,32 @@ app.put("/api/v1/messages/:id", (req, res) => {
         });
     }
 
-    if (!user || !message) {
+    const user = req.body.user;
+    const text = req.body.text;
+
+    if (!user || !text) {
         return res.status(400).send({
             status: "fail",
-            data: {
-                message: "User and message are required"
-            }
+            message: "User and text are required"
         });
     }
 
     messages[id] = {
         user: user,
-        message: message
+        text: text
     };
 
     res.status(200).send({
         status: "success",
+        message: "Message updated",
         data: {
             message: messages[id]
         }
     });
 });
 
+
+// DELETE MESSAGE
 app.delete("/api/v1/messages/:id", (req, res) => {
     const id = req.params.id;
 
@@ -142,13 +151,15 @@ app.delete("/api/v1/messages/:id", (req, res) => {
 
     res.status(200).send({
         status: "success",
+        message: "Message deleted",
         data: {
             message: deletedMessage
         }
     });
 });
 
-// app.listen altijd onderaan
+
+// START SERVER
 app.listen(port, () => {
     console.log(`Server running on port ${port}`);
 });
