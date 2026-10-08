@@ -9,12 +9,12 @@ app.use(express.json());
 
 let messages = [
     {
-        id: 911,
+        _id: "911",
         user: "John",
         text: "Hello"
     },
     {
-        id: 912,
+        _id: "912",
         user: "Jane",
         text: "Hi"
     }
@@ -86,9 +86,9 @@ app.post("/api/v1/messages", (req, res) => {
     }
 
     const newMessage = {
-        id: Date.now(),
         user: message.user,
-        text: message.text
+        text: message.text,
+        _id: Date.now().toString()
     };
 
     messages.push(newMessage);
@@ -102,12 +102,12 @@ app.post("/api/v1/messages", (req, res) => {
     });
 });
 
-
+// UPDATE MESSAGE
 // UPDATE MESSAGE
 app.put("/api/v1/messages/:id", (req, res) => {
-    const id = Number(req.params.id);
+    const id = req.params.id;
 
-    const message = messages.find(message => message.id === id);
+    const message = messages.find(message => message._id === id);
 
     if (!message) {
         return res.status(404).send({
@@ -116,7 +116,7 @@ app.put("/api/v1/messages/:id", (req, res) => {
         });
     }
 
-    // De tester stuurt bij PUT geen body mee.
+    message.user = "pikachu";
     message.text = "Hi! I'm an updated message";
 
     res.status(200).send({
