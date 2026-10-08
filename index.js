@@ -53,9 +53,9 @@ app.get("/api/v1/messages", (req, res) => {
 
 // GET ONE MESSAGE
 app.get("/api/v1/messages/:id", (req, res) => {
-    const id = Number(req.params.id);
+    const id = req.params.id;
 
-    const message = messages.find(message => message.id === id);
+    const message = messages.find(message => message._id === id);
 
     if (!message) {
         return res.status(404).send({
@@ -102,7 +102,7 @@ app.post("/api/v1/messages", (req, res) => {
     });
 });
 
-// UPDATE MESSAGE
+
 // UPDATE MESSAGE
 app.put("/api/v1/messages/:id", (req, res) => {
     const id = req.params.id;
@@ -131,9 +131,9 @@ app.put("/api/v1/messages/:id", (req, res) => {
 
 // DELETE MESSAGE
 app.delete("/api/v1/messages/:id", (req, res) => {
-    const id = Number(req.params.id);
+    const id = req.params.id;
 
-    const index = messages.findIndex(message => message.id === id);
+    const index = messages.findIndex(message => message._id === id);
 
     if (index === -1) {
         return res.status(404).send({
