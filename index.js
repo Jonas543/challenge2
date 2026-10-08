@@ -118,6 +118,7 @@ app.put("/api/v1/messages/:id", (req, res) => {
 
     message.user = "pikachu";
     message.text = "Hi! I'm an updated message";
+    message.__v = 0;
 
     res.status(200).send({
         status: "success",
@@ -142,15 +143,15 @@ app.delete("/api/v1/messages/:id", (req, res) => {
         });
     }
 
-    const deletedMessage = messages[index];
-
     messages.splice(index, 1);
 
     res.status(200).send({
         status: "success",
         message: "Message deleted",
         data: {
-            message: deletedMessage
+            message: {
+                _id: id
+            }
         }
     });
 });
