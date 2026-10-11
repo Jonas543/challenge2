@@ -1,10 +1,12 @@
 import express from "express";
-import { list, get, create } from "../../../controllers/api/v1/messages.js";
+import { list, get, create, update, remove } from "../../../controllers/api/v1/messages.js";
 
 const router = express.Router();
 
 router.get("/", list);
 router.get("/:id", get);
 router.post("/", create);
+router.put("/:id", update);
+router.delete("/:id", remove);
 
 export default router;
