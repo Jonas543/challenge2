@@ -158,5 +158,4 @@ app.delete("/api/v1/messages/:id", (req, res) => {
 
 
 app.listen(port, () => {
-    console.log(`Server running on port ${port}`);
 });
