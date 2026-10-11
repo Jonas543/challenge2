@@ -1,11 +1,19 @@
 import express from "express";
 import cors from "cors";
+import mongoose from "mongoose";
+import "dotenv/config";
+import messagesRouter from "./routes/api/v1/messages.js";
 
 const app = express();
 const port = process.env.PORT || 3000;
 
 app.use(cors());
 app.use(express.json());
+
+// Connect to MongoDB
+mongoose.connect(process.env.MONGODB);
+
+app.use("/api/v1/messages", messagesRouter);
 
 let messages = [
     {
@@ -23,85 +31,8 @@ let messages = [
 
 // HOME
 app.get("/", (req, res) => {
-    res.send("Hello World!");
+    res.send("Hello jonas!");
 });
-
-
-// GET ALL MESSAGES + FILTER BY USER
-app.get("/api/v1/messages", (req, res) => {
-    const user = req.query.user;
-
-    let filteredMessages = messages;
-
-    if (user) {
-        filteredMessages = messages.filter(
-            message => message.user.toLowerCase() === user.toLowerCase()
-        );
-    }
-
-    res.status(200).send({
-        status: "success",
-        message: user
-            ? `Messages from user ${user}`
-            : "GETTING messages",
-        data: {
-            messages: filteredMessages
-        }
-    });
-});
-
-
-// GET ONE MESSAGE
-app.get("/api/v1/messages/:id", (req, res) => {
-    const id = req.params.id;
-
-    const message = messages.find(message => message._id === id);
-
-    if (!message) {
-        return res.status(404).send({
-            status: "error",
-            message: "Message not found"
-        });
-    }
-
-    res.status(200).send({
-        status: "success",
-        message: `GETTING message ${id}`,
-        data: {
-            message: message
-        }
-    });
-});
-
-
-// POST NEW MESSAGE
-app.post("/api/v1/messages", (req, res) => {
-    const message = req.body.message;
-
-    if (!message || !message.user || !message.text) {
-        return res.status(400).send({
-            status: "fail",
-            message: "User and text are required"
-        });
-    }
-
-    const newMessage = {
-        user: message.user,
-        text: message.text,
-        _id: Date.now().toString()
-    };
-
-    messages.push(newMessage);
-
-    res.status(200).send({
-        status: "success",
-        message: "Message saved",
-        data: {
-            message: newMessage
-        }
-    });
-});
-
 
 // UPDATE MESSAGE
 app.put("/api/v1/messages/:id", (req, res) => {
