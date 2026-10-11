@@ -36,6 +36,15 @@ export const create = async (req, res) => {
     try {
         const messageData = req.body.message;
 
+        if (!messageData || !messageData.user || !messageData.text) {
+            return res.status(400).json({
+                status: "fail",
+                data: {
+                    message: "User and text are required"
+                }
+            });
+        }
+
         const message = new Message();
         message.user = messageData.user;
         message.text = messageData.text;
@@ -66,10 +75,12 @@ export const get = async (req, res) => {
 
         if (!message) {
             return res.status(404).json({
-                status: "error",
+                status: "fail",
+                data: {
                 message: "Message not found"
-            });
-        }
+            }
+        });
+    }
 
         res.status(200).json({
             status: "success",
@@ -92,11 +103,13 @@ export const update = async (req, res) => {
         const message = await Message.findById(req.params.id);
 
         if (!message) {
-            return res.status(404).json({
-                status: "error",
-                message: "Message not found"
-            });
+    return res.status(404).json({
+        status: "fail",
+        data: {
+            message: "Message not found"
         }
+    });
+}
 
         message.text = req.body.message.text;
 
@@ -123,11 +136,13 @@ export const remove = async (req, res) => {
         const message = await Message.findByIdAndDelete(req.params.id);
 
         if (!message) {
-            return res.status(404).json({
-                status: "error",
-                message: "Message not found"
-            });
+    return res.status(404).json({
+        status: "fail",
+        data: {
+            message: "Message not found"
         }
+    });
+}
 
         res.status(200).json({
             status: "success",
